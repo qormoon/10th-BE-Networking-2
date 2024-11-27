@@ -5,12 +5,15 @@ import static cotato.backend.common.exception.ErrorCode.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cotato.backend.common.excel.ExcelUtils;
 import cotato.backend.common.exception.ApiException;
+import cotato.backend.common.exception.ErrorCode;
 import cotato.backend.domains.post.dto.request.CreatePostRequest;
+import cotato.backend.domains.post.dto.response.PostResponse;
 import cotato.backend.domains.post.entity.Post;
 import cotato.backend.domains.post.repository.PostRepository;
 import lombok.AccessLevel;
@@ -57,5 +60,14 @@ public class PostService {
 			.name(request.getName())
 			.build();
 		postRepository.save(post);
+	}
+
+	public PostResponse getPostById(Long id) {
+		Post post = postRepository.findById(id)
+			.orElseThrow(() -> ApiException.from(ErrorCode.POST_NOT_FOUND));
+
+		post.incrementViews();
+
+		return PostResponse.from(post);
 	}
 }

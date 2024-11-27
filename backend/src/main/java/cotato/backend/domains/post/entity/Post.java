@@ -34,6 +34,7 @@ public class Post {
 	@Column(nullable = false)
 	private int views = 0;
 
-
-
+	public void incrementViews() {
+		this.views++;
+	}
 }
