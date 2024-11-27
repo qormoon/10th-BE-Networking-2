@@ -78,4 +78,10 @@ public class PostService {
 		Page<Post> postPage = postRepository.findAllByOrderByLikesDesc(pageable);
 		return PostPageResponse.from(postPage);
 	}
+
+	public void deletePost(Long postId) {
+		Post post = postRepository.findById(postId)
+			.orElseThrow(() -> ApiException.from(ErrorCode.POST_NOT_FOUND));
+		postRepository.delete(post);
+	}
 }
