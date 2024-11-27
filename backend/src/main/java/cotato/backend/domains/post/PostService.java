@@ -5,6 +5,8 @@ import static cotato.backend.common.exception.ErrorCode.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +15,7 @@ import cotato.backend.common.excel.ExcelUtils;
 import cotato.backend.common.exception.ApiException;
 import cotato.backend.common.exception.ErrorCode;
 import cotato.backend.domains.post.dto.request.CreatePostRequest;
+import cotato.backend.domains.post.dto.response.PostPageResponse;
 import cotato.backend.domains.post.dto.response.PostResponse;
 import cotato.backend.domains.post.entity.Post;
 import cotato.backend.domains.post.repository.PostRepository;
@@ -69,5 +72,10 @@ public class PostService {
 		post.incrementViews();
 
 		return PostResponse.from(post);
+	}
+
+	public PostPageResponse getPostList(Pageable pageable) {
+		Page<Post> postPage = postRepository.findAllByOrderByLikesDesc(pageable);
+		return PostPageResponse.from(postPage);
 	}
 }
