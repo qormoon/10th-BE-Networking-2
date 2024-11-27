@@ -10,6 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cotato.backend.common.excel.ExcelUtils;
 import cotato.backend.common.exception.ApiException;
+import cotato.backend.domains.post.dto.request.CreatePostRequest;
+import cotato.backend.domains.post.entity.Post;
+import cotato.backend.domains.post.repository.PostRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Transactional
 public class PostService {
+	private final PostRepository postRepository;
 
 	// 로컬 파일 경로로부터 엑셀 파일을 읽어 Post 엔터티로 변환하고 저장
 	public void saveEstatesByExcel(String filePath) {
@@ -30,7 +34,11 @@ public class PostService {
 					String content = row.get("content");
 					String name = row.get("name");
 
-					return new Post(title, content, name);
+					return Post.builder()
+						.title(title)
+						.content(content)
+						.name(name)
+						.build();
 				})
 				.collect(Collectors.toList());
 
@@ -38,5 +46,14 @@ public class PostService {
 			log.error("Failed to save estates by excel", e);
 			throw ApiException.from(INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	public void createPost(CreatePostRequest request) {
+		Post post = Post.builder()
+			.title(request.getTitle())
+			.content(request.getContent())
+			.name(request.getName())
+			.build();
+		postRepository.save(post);
 	}
 }
